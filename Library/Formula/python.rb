@@ -106,6 +106,28 @@ class Python < Formula
       args << "--enable-universalsdk=/" << "--with-universal-archs=intel"
     end
 
+
+    sqlite = Formula["sqlite"].opt_prefix
+    cflags = "CFLAGS=-I#{HOMEBREW_PREFIX}/include -I#{sqlite}/include"
+    ldflags = "LDFLAGS=-L#{HOMEBREW_PREFIX}/lib -L#{sqlite}/lib"
+    
+    # begin modify
+    cflags += " -I/home/lisijo/.linuxbrew/opt/readline/include"
+    ldflags += " -L/home/lisijo/.linuxbrew/opt/readline/lib"
+    
+    cflags += " -I/home/lisijo/.linuxbrew/opt/tcl-tk/include"
+    ldflags += " -L/home/lisijo/.linuxbrew/opt/tcl-tk/lib"
+    
+    cflags += " -I/home/lisijo/.linuxbrew/opt/bzip2/include"
+    ldflags += " -L/home/lisijo/.linuxbrew/opt/bzip2/lib"
+    
+    cflags += " -I/usr/include/ncurses"
+    ldflags += " -L/usr/lib/ncurses"
+    # end modify
+
+    args << cflags
+    args << ldflags
+
     # Allow sqlite3 module to load extensions:
     # http://docs.python.org/library/sqlite3.html#f1
     if build.with? "sqlite"
@@ -212,6 +234,22 @@ class Python < Formula
     sqlite = Formula["sqlite"].opt_prefix
     cflags = "CFLAGS=-I#{HOMEBREW_PREFIX}/include -I#{sqlite}/include"
     ldflags = "LDFLAGS=-L#{HOMEBREW_PREFIX}/lib -L#{sqlite}/lib"
+   
+    # begin modify 
+    cflags += " -I/home/lisijo/.linuxbrew/opt/readline/include"
+    ldflags += " -L/home/lisijo/.linuxbrew/opt/readline/lib"
+    
+    cflags += " -I/home/lisijo/.linuxbrew/opt/tcl-tk/include"
+    ldflags += " -L/home/lisijo/.linuxbrew/opt/tcl-tk/lib"
+    
+    cflags += " -I/home/lisijo/.linuxbrew/opt/bzip2/include"
+    ldflags += " -L/home/lisijo/.linuxbrew/opt/bzip2/lib"
+    
+    cflags += " -I/usr/include/ncurses"
+    ldflags += " -L/usr/lib/ncurses"
+    
+    #end modify
+
     if build.with? "brewed-tk"
       tcl_tk = Formula["tcl-tk"].opt_prefix
       cflags += " -I#{tcl_tk}/include"
@@ -234,9 +272,9 @@ class Python < Formula
     args << "MACOSX_DEPLOYMENT_TARGET=#{MacOS.version}"
     # We want our readline! This is just to outsmart the detection code,
     # superenv handles that cc finds includes/libs!
-    inreplace "setup.py",
-              "do_readline = self.compiler.find_library_file(lib_dirs, 'readline')",
-              "do_readline = '#{Formula["readline"].opt_lib}/libhistory.dylib'"
+    #edit inreplace "setup.py",
+    #edit          "do_readline = self.compiler.find_library_file(lib_dirs, 'readline')",
+    #edit          "do_readline = '#{Formula["readline"].opt_lib}/libhistory.dylib'"
   end
 
   def distutils_fix_stdenv
@@ -245,6 +283,12 @@ class Python < Formula
     #     building dbm using ndbm
     #     error: /usr/include/zlib.h: No such file or directory
     ENV.append "CPPFLAGS", "-I#{MacOS.sdk_path}/usr/include" if OS.mac? && !MacOS::CLT.installed?
+    
+    # more edits 
+    ENV.append "CPPFLAGS", "-I/home/lisijo/.linuxbrew/opt/readline/include"
+    ENV.append "CPPFLAGS", "-I/home/lisijo/.linuxbrew/opt/tcl-tk/include"
+    ENV.append "CPPFLAGS", "-I/home/lisijo/.linuxbrew/opt/bzip2/include"
+    ENV.append "CPPFLAGS", "-I/usr/include/ncurses"
 
     # Don't use optimizations other than "-Os" here, because Python's distutils
     # remembers (hint: `python-config --cflags`) and reuses them for C

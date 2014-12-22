@@ -44,6 +44,12 @@ class Gnutls < Formula
       args << "--with-guile-site-dir=no"
     end
 
+
+    #edit
+    ENV.append "CFLAGS", " -I/home/lisijo/.linuxbrew/opt/nettle/include"
+    ENV.append "LDFLAGS", " -I/home/lisijo/.linuxbrew/opt/nettle/lib"
+    #end edit
+
     system "./configure", *args
     system "make", "install"
 
